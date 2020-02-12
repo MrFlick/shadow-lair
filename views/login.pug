@@ -1,0 +1,14 @@
+extends headers
+
+block body
+    div.ui.borderless.huge.menu
+      a.header.item(href="/") Home
+    div.main
+     | Please Login
+     if messages
+      ul
+        each m in messages
+          li= m
+     ul
+       li: a(href="/auth/google") Google
+       li: a(href="/auth/facebook") Facebook
