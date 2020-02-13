@@ -22,6 +22,23 @@ module.exports = (sequelize) => {
     email: Sequelize.TEXT,
   });
 
+  const Role = sequelize.define('roles', {
+    roleCode: {
+      type: Sequelize.TEXT,
+      primaryKey: true,
+    },
+    roleDesc: Sequelize.TEXT,
+  });
+
+  Person.belongsToMany(Role, {
+    through: 'person_roles',
+    foreignKey: 'personId',
+  });
+  Role.belongsToMany(Person, {
+    through: 'person_roles',
+    foreignKey: 'roleCode',
+  });
+
   const LoginId = sequelize.define('login_ids', {
     source: { type: Sequelize.TEXT, primaryKey: true },
     identifier: { type: Sequelize.TEXT, primaryKey: true },
@@ -44,7 +61,7 @@ module.exports = (sequelize) => {
       where: { source, identifier },
     }).then((record) => {
       if (record) {
-        return Person.findByPk(record.personId);
+        return Person.findByPk(record.personId, { include: Role });
       }
       if (log) {
         const attempt = { source, identifier, name: profile.displayName };
@@ -58,8 +75,8 @@ module.exports = (sequelize) => {
     });
   };
 
-
   return {
     Person,
+    Role,
   };
 };

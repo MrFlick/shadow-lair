@@ -1,8 +1,9 @@
 const express = require('express');
 const modelSource = require('../models/models');
 
+const { requireRole } = require('../utils/permission');
+
 const router = express.Router();
-router.use(express.json());
 
 function getRouter(sequelize) {
   const models = modelSource(sequelize);
@@ -22,6 +23,10 @@ function getRouter(sequelize) {
     models.Person.findByPk(user.personId).then((person) => {
       res.send({ db: person, session: user });
     });
+  });
+
+  router.get('/protected', requireRole('admin'), (req, res) => {
+    res.send('admin');
   });
 
   router.get('*', (req, res) => {
