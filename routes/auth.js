@@ -31,11 +31,17 @@ function initAuth(app, config, sequelize) {
     app.use((req, res, next) => {
       if (!req.user && req.hostname === 'localhost') {
         getUserFromProfile(config.localuser, (err, user) => {
-          if (err) next(err);
-          req.login(user, (err2) => {
-            if (err2) next(err2);
+          if (err) {
+            next(err);
+          } else if (!user) {
+            console.log('unable to find login for', config.localuser);
             next();
-          });
+          } else {
+            req.login(user, (err2) => {
+              if (err2) return next(err2);
+              return next();
+            });
+          }
         });
       } else {
         next();

@@ -20,17 +20,17 @@ function getRouter(sequelize) {
 
   router.get('/me', (req, res) => {
     const { user } = req;
-    models.Person.findByPk(user.personId).then((person) => {
-      res.send({ db: person, session: user });
+    res.send(user);
+  });
+
+  router.get('/roles', requireRole('admin'), (req, res) => {
+    models.Role.findAll().then((roles) => {
+      res.send(roles);
     });
   });
 
-  router.get('/protected', requireRole('admin'), (req, res) => {
-    res.send('admin');
-  });
-
-  router.get('*', (req, res) => {
-    res.send('hello');
+  router.use((req, res) => {
+    res.status(404).send('Unknown endpoint');
   });
 
   // API Error Handler
